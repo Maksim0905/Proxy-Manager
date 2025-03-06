@@ -1,0 +1,10 @@
+{
+  "extension_name": {
+    "message": "Менеджер прокси",
+    "description": "Название расширения"
+  },
+  "extension_description": {
+    "message": "Управление и использование HTTP прокси с аутентификацией",
+    "description": "Описание расширения"
+  }
+} 
