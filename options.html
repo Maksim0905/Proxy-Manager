@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Управление прокси</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 {
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="file"], textarea {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+    .proxy-list {
+      margin-top: 20px;
+    }
+    .proxy-item {
+      background-color: #f5f5f5;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .proxy-item-active {
+      border-left: 5px solid #4CAF50;
+    }
+    button {
+      padding: 8px 15px;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    button:hover {
+      background-color: #3367d6;
+    }
+    button.delete {
+      background-color: #f44336;
+    }
+    button.delete:hover {
+      background-color: #d32f2f;
+    }
+    .status {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      max-width: 350px;
+      padding: 20px;
+      border-radius: 4px;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s ease-in-out;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+    .note {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      color: #856404;
+    }
+    .formats {
+      background-color: #e9ecef;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 15px;
+      cursor: pointer;
+      margin-right: 5px;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      background-color: #f5f5f5;
+    }
+    .tab.active {
+      background-color: white;
+      border-bottom: 1px solid white;
+      margin-bottom: -1px;
+      font-weight: bold;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .flag {
+      width: 16px;
+      height: 16px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .proxy-info {
+      display: flex;
+      align-items: center;
+    }
+    .proxy-status {
+      margin-left: 10px;
+      padding: 3px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .valid {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .invalid {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .unknown {
+      background-color: #e9ecef;
+      color: #6c757d;
+    }
+    .validating {
+      background-color: #fff3cd;
+      color: #856404;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+    #bypass-list-container {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .bypass-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px;
+      margin-bottom: 5px;
+      background-color: #f5f5f5;
+      border-radius: 3px;
+    }
+    .bypass-remove {
+      color: #f44336;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .file-upload {
+      border: 1px dashed #ccc;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      background-color: #f9f9f9;
+    }
+    .buttons-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .language-switcher {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+    }
+    .language-switcher button {
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      color: #333;
+      width: 30px;
+      height: 24px;
+      margin: 0 2px;
+      padding: 0;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .language-switcher button.active {
+      background-color: #4285f4;
+      color: white;
+      border-color: #4285f4;
+    }
+    
+    .buy-proxy-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 15px;
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .buy-proxy-button::after {
+      content: "В разработке";
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background-color: #ff9800;
+      color: white;
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 0 0 0 5px;
+      transform: rotate(5deg);
+    }
+    
+    .buy-proxy-button:hover {
+      background-color: #45a049;
+    }
+    
+    .header-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-container">
+    <h1 data-locale-key="proxy_management">Управление прокси</h1>
+    <div class="language-switcher">
+      <button id="lang-en">EN</button>
+      <button id="lang-ru">RU</button>
+    </div>
+  </div>
+  
+  <!-- Вкладки -->
+  <div class="tabs">
+    <div class="tab active" data-tab="proxies" data-locale-key="proxies_tab">Прокси</div>
+    <div class="tab" data-tab="bypass" data-locale-key="bypass_tab">Локальные адреса</div>
+  </div>
+
+  <!-- Содержимое вкладки "Прокси" -->
+  <div id="proxies-tab" class="tab-content active">
+    <div class="formats">
+      <p><strong data-locale-key="supported_formats">Поддерживаемые форматы:</strong></p>
+      <ul>
+        <li>ip:port</li>
+        <li>user:password@ip:port</li>
+        <li>ip:port:user:password</li>
+      </ul>
+    </div>
+
+    <div class="form-group">
+      <label for="proxy-input" data-locale-key="add_proxy">Добавить прокси:</label>
+      <input type="text" id="proxy-input" data-locale-placeholder="add_proxy_placeholder" placeholder="Например: ip:port, user:password@ip:port или ip:port:user:password">
+      <button id="add-proxy" data-locale-key="add_proxy">Добавить</button>
+    </div>
+
+    <div class="form-group">
+      <label for="proxy-list-input" data-locale-key="add_list">Или добавить список прокси (каждый с новой строки):</label>
+      <textarea id="proxy-list-input" rows="5" data-locale-placeholder="add_list_placeholder" placeholder="Введите список прокси, каждый с новой строки"></textarea>
+      <button id="add-proxy-list" data-locale-key="add_list">Добавить список</button>
+    </div>
+    
+    <div class="form-group file-upload">
+      <label for="proxy-file" data-locale-key="upload_from_file">Загрузить прокси из файла:</label>
+      <input type="file" id="proxy-file" accept=".txt,.csv,.list">
+      <button id="upload-proxy-file" data-locale-key="upload_from_file">Загрузить</button>
+      <p class="note" data-locale-key="supported_files">Поддерживаются файлы формата .txt, .csv, и .list с прокси, по одному на строку</p>
+    </div>
+
+    <div class="form-group">
+      <div class="buttons-group">
+        <button id="check-all-proxies" data-locale-key="check_all">Проверить все прокси</button>
+        <button id="remove-invalid-proxies" class="delete" data-locale-key="delete_invalid">Удалить невалидные прокси</button>
+        <button id="remove-all-proxies" class="delete" data-locale-key="delete_all">Удалить все прокси</button>
+      </div>
+    </div>
+
+    <h2 data-locale-key="your_proxies">Ваши прокси:</h2>
+    <div id="proxy-list" class="proxy-list">
+      <!-- Список прокси будет добавлен динамически -->
+    </div>
+    
+    <div class="form-group" style="text-align: center; margin-top: 20px;">
+      <button id="buy-proxy" class="buy-proxy-button" data-locale-key="buy_proxy">
+        <span style="margin-right: 5px;">💰</span> Купить прокси
+      </button>
+    </div>
+  </div>
+
+  <!-- Содержимое вкладки "Локальные адреса" -->
+  <div id="bypass-tab" class="tab-content">
+    <h2 data-locale-key="bypass_title">Локальные адреса (исключения для прокси)</h2>
+    <p data-locale-key="bypass_description">Трафик на следующие адреса не будет проходить через прокси:</p>
+    
+    <div class="form-group">
+      <label for="bypass-input" data-locale-key="add_bypass">Добавить локальный адрес:</label>
+      <input type="text" id="bypass-input" data-locale-placeholder="bypass_placeholder" placeholder="Например: localhost, 192.168.*.*, *.local">
+      <button id="add-bypass" data-locale-key="add_bypass">Добавить</button>
+    </div>
+    
+    <h3 data-locale-key="current_exceptions">Текущие исключения:</h3>
+    <div id="bypass-list-container">
+      <!-- Список исключений будет добавлен динамически -->
+    </div>
+    
+    <button id="reset-bypass" data-locale-key="reset_bypass">Вернуть список по умолчанию</button>
+    
+    <div class="form-group" style="text-align: center; margin-top: 20px;">
+      <button id="buy-proxy-bypass" class="buy-proxy-button" data-locale-key="buy_proxy">
+        <span style="margin-right: 5px;">💰</span> Купить прокси
+      </button>
+    </div>
+  </div>
+
+  <div id="status" class="status" style="display: none;"></div>
+
+  <script src="localization.js"></script>
+  <script src="options.js"></script>
+</body>
+</html> 

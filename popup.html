@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Настройки прокси</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      width: 300px;
+      padding: 10px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"], input[type="number"], input[type="password"] {
+      width: 100%;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+    .status {
+      margin-top: 10px;
+      padding: 5px;
+      border-radius: 3px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    button {
+      padding: 8px 15px;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #3367d6;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .proxy-manager-link {
+      margin-top: 15px;
+      text-align: center;
+    }
+    .proxy-manager-link a {
+      color: #4285f4;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .proxy-manager-link a:hover {
+      text-decoration: underline;
+    }
+    .active-proxy-info {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+    }
+    .proxy-dropdown {
+      margin-top: 15px;
+    }
+    .proxy-list-container {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: none;
+    }
+    .proxy-list-item {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .proxy-list-item:hover {
+      background-color: #f5f5f5;
+    }
+    .proxy-list-item.active {
+      background-color: #e3f2fd;
+      border-left: 3px solid #2196F3;
+    }
+    .proxy-list-item:last-child {
+      border-bottom: none;
+    }
+    .dropdown-toggle {
+      width: 100%;
+      text-align: left;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .dropdown-toggle:after {
+      content: "▼";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .no-proxies {
+      padding: 10px;
+      color: #6c757d;
+      text-align: center;
+      font-style: italic;
+    }
+    .flag {
+      width: 16px;
+      height: 12px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .proxy-status {
+      margin-left: 5px;
+      padding: 2px 4px;
+      border-radius: 2px;
+      font-size: 11px;
+    }
+    .unknown {
+      background-color: #e9ecef;
+      color: #6c757d;
+    }
+    .valid {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .invalid {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .validating {
+      background-color: #fff3cd;
+      color: #856404;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+    .security-section {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      border-left: 3px solid #dc3545;
+    }
+    .security-title {
+      margin-top: 0;
+      color: #721c24;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .language-switcher {
+      position: absolute;
+      top: -5px;
+      right: 5px;
+      display: flex;
+      align-items: center;
+      z-index: 10;
+    }
+    .language-switcher button {
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      color: #333;
+      width: 30px;
+      height: 24px;
+      margin: 0 2px;
+      padding: 0;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .language-switcher button.active {
+      background-color: #4285f4;
+      color: white;
+      border-color: #4285f4;
+    }
+    
+    .header-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-top: 5px;
+      min-height: 40px;
+    }
+    
+    .header-container h2 {
+      margin-top: 15px;
+      position: relative;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-container">
+    <h2 data-locale-key="settings">Настройки прокси</h2>
+    <div class="language-switcher">
+      <button id="lang-en">EN</button>
+      <button id="lang-ru">RU</button>
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <label class="switch">
+      <input type="checkbox" id="enabled">
+      <span class="slider"></span>
+    </label>
+    <label for="enabled" style="display: inline-block; margin-left: 10px;" data-locale-key="enable_proxy">Включить прокси</label>
+  </div>
+  
+  <div class="proxy-dropdown">
+    <button id="proxy-dropdown-toggle" class="dropdown-toggle" data-locale-key="select_proxy">Выбрать прокси</button>
+    <div id="proxy-list-container" class="proxy-list-container">
+      <!-- Список прокси будет добавлен динамически -->
+    </div>
+  </div>
+
+  <div id="active-proxy-info" class="active-proxy-info" style="display: none;">
+    <strong data-locale-key="active_proxy">Активный прокси:</strong>
+    <div id="active-proxy-details"></div>
+  </div>
+  
+  <div class="security-section">
+    <div class="security-title" data-locale-key="security">Защита от утечек</div>
+    <div class="form-group">
+      <label class="switch">
+        <input type="checkbox" id="webrtc-protection">
+        <span class="slider"></span>
+      </label>
+      <label for="webrtc-protection" style="display: inline-block; margin-left: 10px;" data-locale-key="webrtc_protection">
+        Защита от WebRTC утечек
+      </label>
+    </div>
+    <div class="form-group">
+      <label class="switch">
+        <input type="checkbox" id="timezone-protection">
+        <span class="slider"></span>
+      </label>
+      <label for="timezone-protection" style="display: inline-block; margin-left: 10px;" data-locale-key="timezone_protection">
+        Скрывать часовой пояс
+      </label>
+    </div>
+  </div>
+  
+  <div class="proxy-manager-link">
+    <a href="#" id="open-proxy-manager" data-locale-key="manage_proxies">Управление списком прокси →</a>
+  </div>
+  
+  <div id="status" class="status" style="display: none;"></div>
+  
+  <script src="localization.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
