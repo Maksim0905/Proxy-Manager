@@ -1,0 +1,10 @@
+{
+  "extension_name": {
+    "message": "Proxy Manager",
+    "description": "Extension name"
+  },
+  "extension_description": {
+    "message": "Manage and use HTTP proxies with authentication",
+    "description": "Extension description"
+  }
+} 
